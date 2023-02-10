@@ -1,0 +1,48 @@
+using UnityEngine;
+using System.Collections;
+ 
+public class ObjectDragger : MonoBehaviour 
+{
+
+    //public Vector3 screenPoint;
+    //public Vector3 offset;
+
+    //void OnMouseDown()
+    //{
+    //	screenPoint = Camera.main.WorldToScreenPoint(transform.position);
+    //	offset = gameObject.transform.position - Camera.main.WorldToScreenPoint(new Vector3(Input.mousePosition.x,
+    //           8.43f, Input.mousePosition.y));
+    //}
+
+    //void OnMouseDrag()
+    //{
+    //	Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, 8.43f, Input.mousePosition.y);
+    //	transform.position = Camera.main.WorldToScreenPoint(curScreenPoint) + offset;
+    //}
+
+    private float distance;
+    private bool isDragging;
+
+    private void OnMouseDown()
+    {
+        distance = Vector3.Distance(transform.position, Camera.main.transform.position);
+        isDragging = true;
+    }
+
+    private void OnMouseUp()
+    {
+        isDragging = false;
+    }
+
+    private void Update()
+    {
+        if (isDragging)
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Vector3 rayPoint = ray.GetPoint(distance);
+            transform.position = new Vector3(rayPoint.x, transform.position.y, rayPoint.z);
+        }
+    }
+
+
+}
