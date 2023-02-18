@@ -36,8 +36,8 @@ public class deltaPosition : MonoBehaviour
                 {
                     Vector3 direction = sphere2.transform.position - sphere1.transform.position;
                     direction.Normalize();
-                    sphere1Rigid.AddForce(direction * fd.force, ForceMode.Force);
-                    sphere2Rigid.AddForce(-direction * fd.force, ForceMode.Force);
+                    sphere1Rigid.AddForce(direction * 800, ForceMode.Force);
+                    sphere2Rigid.AddForce(-direction * 800, ForceMode.Force);
                 }
                 else
                 {
