@@ -26,7 +26,8 @@ public class CountDownUI : MonoBehaviour
             {
                 isCountingDown = false;
                 obj.isLeftRight= true;
-               
+                countdownText.text = "";
+
             }
         }
     }

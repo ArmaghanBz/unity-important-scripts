@@ -13,8 +13,6 @@ public class cameraFollow : MonoBehaviour
 
     private void Start()
     {
-        // You can also specify your own offset from inspector
-        // by making isCustomOffset bool to true
         if (!isCustomOffset)
         {
             offset = transform.position - target.position;
@@ -33,6 +31,6 @@ public class cameraFollow : MonoBehaviour
         targetPos, smoothSpeed);
 
         transform.position = smoothFollow;
-        transform.LookAt(target);
+        //transform.LookAt(target);
     }
 }
