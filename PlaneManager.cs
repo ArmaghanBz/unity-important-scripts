@@ -45,58 +45,6 @@ public class PlaneManager : MonoBehaviour
 
     void Update()
     {
-        //if (coinsCollected >= 2)
-        //{
-        //    currentPlaneIndex++;
-        //    if (currentPlaneIndex >= planes.Length)
-        //    {
-        //        currentPlaneIndex = planes.Length - 1;
-        //    }
-        //    planes[currentPlaneIndex].SetActive(true);
-        //    planes[currentPlaneIndex - 1].SetActive(false);
-        //    coinsCollected = 0;
-        //}
-        //else if (coinsCollected < 0)
-        //{
-        //    currentPlaneIndex--;
-        //    if (currentPlaneIndex < 0)
-        //    {
-        //        currentPlaneIndex = 0;
-        //    }
-        //    planes[currentPlaneIndex].SetActive(true);
-        //    planes[(currentPlaneIndex + 1) % planes.Length].SetActive(false);
-        //    coinsCollected = 0;
-        //}
-        //if(PlaneCapacity > 50 && PlaneCapacity <= 100)
-        //{
-        //    planes[1].SetActive(true);
-        //    planes[0].SetActive(false);
-        //}
-        //else if(PlaneCapacity >100 && PlaneCapacity <= 150)
-        //{
-        //    planes[1].SetActive(false);
-        //    planes[2].SetActive(true);
-        //}
-        //else if (PlaneCapacity > 150 && PlaneCapacity <= 200)
-        //{
-        //    planes[2].SetActive(false);
-        //    planes[3].SetActive(true);
-        //}
-        //else if (PlaneCapacity > 200 && PlaneCapacity <= 250)
-        //{
-        //    planes[3].SetActive(false);
-        //    planes[4].SetActive(true);
-        //}
-        //else if (PlaneCapacity > 250 && PlaneCapacity <= 300)
-        //{
-        //    planes[4].SetActive(false);
-        //    planes[5].SetActive(true);
-        //}
-        //else if (PlaneCapacity > 300 && PlaneCapacity <= 350)
-        //{
-        //    planes[5].SetActive(false);
-        //    planes[6].SetActive(true);
-        //}
 
         if (isFlying)
         {
@@ -118,6 +66,21 @@ public class PlaneManager : MonoBehaviour
                     isFlying = false;
                     currentFlyingDistance = 0f;
                 }
+            }
+        }
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("endState"))
+        {
+            print("End");
+        }
+        else if (collision.gameObject.CompareTag("barrier"))
+        {
+            Animator barrierAnimator = collision.gameObject.GetComponent<Animator>();
+            if (barrierAnimator != null)
+            {
+                barrierAnimator.enabled = true;
             }
         }
     }
@@ -150,19 +113,6 @@ public class PlaneManager : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        //if (other.gameObject.CompareTag("greenWall"))
-        //{
-        //    print("Green Hit");
-        //    coinsCollected += 2;
-        //    other.GetComponent<Collider>().enabled = false; 
-        //}
-        //else if (other.gameObject.CompareTag("redWall"))
-        //{
-        //    print("Red Hit");
-        //    coinsCollected -= 1;
-        //    other.GetComponent<Collider>().enabled = false;
-
-        //}
         if (other.gameObject.CompareTag("endPoint"))
         {
             isLeftRight = false;
