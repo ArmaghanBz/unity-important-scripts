@@ -1,24 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class PlaneManager : MonoBehaviour
 {
     public GameObject[] planes;
+    public GameObject fuelBarCanvas;
     public int currentPlaneIndex = 0;
     public int coinsCollected = 0;
     public bool isLeftRight;
+    public int score,highScore;
 
     public CountDownUI countdownUI;
+    public GameObject levelDone;
 
+    
     public float flyingSpeed = 50f;
-    public float flyingDistance = 1000f;
+    float flyingDistance = 2000f;
 
     public bool isFlying = false;
     private float currentFlyingDistance = 0f;
     private float lateralSpeed;
+    private Text scoreText;
 
     public int PlaneCapacity = 0;
+
+    public FuelBar fuelbar;
 
 
     Dictionary<int, int> capacityToPlaneIndex = new Dictionary<int, int>()
@@ -32,7 +41,6 @@ public class PlaneManager : MonoBehaviour
         { 350, 6 }
     };
 
-
     void Start()
     {
         for (int i = 0; i < planes.Length; i++)
@@ -41,6 +49,7 @@ public class PlaneManager : MonoBehaviour
         }
         isLeftRight = true;
         countdownUI = FindObjectOfType<CountDownUI>();
+        levelDone.SetActive(false);
     }
 
     void Update()
@@ -50,6 +59,7 @@ public class PlaneManager : MonoBehaviour
         {
             if (Input.GetMouseButton(0))
             {
+                
                 float inputX = Input.GetAxis("Mouse X");
                 Vector3 position = transform.position;
                 position.x += inputX * flyingSpeed * Time.deltaTime;
@@ -66,6 +76,8 @@ public class PlaneManager : MonoBehaviour
                     isFlying = false;
                     currentFlyingDistance = 0f;
                 }
+                
+
             }
         }
     }
@@ -82,19 +94,30 @@ public class PlaneManager : MonoBehaviour
             {
                 barrierAnimator.enabled = true;
             }
+
+            PlaneCapacity -= 50;
+        }
+        else if (collision.gameObject.CompareTag("road"))
+        {
+            isLeftRight = false;
+            isFlying= false;
+            print("Level Complete");
+            levelDone.SetActive(true);
+        }
+        else if (collision.gameObject.CompareTag("batteries"))
+        {
+            fuelbar.SetHealth(0.1);
+            Destroy(collision.gameObject);
         }
     }
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Coin"))
-        {
-            Destroy(other.gameObject);
-            coinsCollected++;
-        }
-        else if (other.gameObject.CompareTag("wall"))
+        
+        if (other.gameObject.CompareTag("wall"))
         {
             GateValues gateValues = other.gameObject.GetComponent<GateValues>();
             PlaneCapacity += gateValues.value;
+            score += gateValues.value;
             foreach (var capacity in capacityToPlaneIndex.Keys)
             {
                 if (PlaneCapacity <= capacity)
@@ -103,10 +126,12 @@ public class PlaneManager : MonoBehaviour
                     for (int i = 0; i < planes.Length; i++)
                     {
                         planes[i].SetActive(i == planeIndex);
+                        //GetComponent<Rigidbody>().drag = planes[planeIndex].GetComponent<PlaneDrag>().dragValue;
                     }
                     break;
                 }
             }
+            
         }
         
     }
@@ -119,6 +144,8 @@ public class PlaneManager : MonoBehaviour
             countdownUI.StartCountdown();
             StartCoroutine(StartFlyingAfterCountdown());
             Destroy(other.gameObject);
+            GetComponent<Rigidbody>().drag = fuelbar.slider.value;
+            fuelBarCanvas.SetActive(false);
         }
     }
     IEnumerator StartFlyingAfterCountdown()
