@@ -1,78 +1,42 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody), typeof(BoxCollider))]
 public class PlayerMovement : MonoBehaviour
 {
-   
-    Rigidbody m_Rigidbody;
-    public float m_Speed = 20f;
-    public bool isMove;
-    public float force = 100f;
-    private Menu menuScript;
-    private Menu counter;
-    void Start()
+    [SerializeField] private Rigidbody rb;
+    [SerializeField] private FixedJoystick fJ;
+    public GameObject[] tools;
+    // [SerializeField] private Animator anime;
+
+    private void Start()
     {
-        menuScript = FindObjectOfType<Menu>();
-        counter = FindObjectOfType<Menu>();
-        m_Rigidbody = GetComponent<Rigidbody>();
+        tools[0].SetActive(true);
+        tools[1].SetActive(false);
     }
 
-    void FixedUpdate()
+    [SerializeField] private float movement;
+    private void FixedUpdate()
     {
-        if (menuScript.playerIsActive == true)
+        Vector3 direction = new Vector3(fJ.Horizontal, 0f, fJ.Vertical).normalized;
+        if (direction.magnitude >= 0.1f)
         {
-            float horizontal = Input.GetAxis("Horizontal");
-            float vertical = Input.GetAxis("Vertical");
+            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + Camera.main.transform.eulerAngles.y;
+            Quaternion rotation = Quaternion.Euler(0f, targetAngle, 0f);
+            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * 10f);
 
-            horizontal = horizontal * -1;
-            vertical = vertical * -1;
-
-            Vector3 m_Input = new Vector3(horizontal, 0, vertical);
-            if (isMove == true)
-            {
-                m_Rigidbody.MovePosition(transform.position + m_Input * Time.fixedDeltaTime * m_Speed);
-            }
-        }
-    }
-    private void OnCollisionEnter(Collision other)
-    {
-        if (other.gameObject.tag == "Walls")
-        {
-            Renderer wallRenderer = other.gameObject.GetComponent<Renderer>();
-            Renderer playerRenderer = GetComponent<Renderer>();
-            Collider wall = other.gameObject.GetComponent<Collider>();
-
-            if (wallRenderer.material.color == playerRenderer.material.color)
-            {
-                wall.isTrigger = true;
-            }
-            else if (wallRenderer.material.color != playerRenderer.material.color)
-            {
-                isMove = false;
-                Vector3 forceDirection = (other.transform.position - transform.position).normalized;
-                GetComponent<Rigidbody>().AddForce(-forceDirection * force, ForceMode.Impulse);
-            }
-        }
-        else if (other.gameObject.tag == "Enemy")
-        {
-            Material enemyMaterial = other.gameObject.GetComponent<Renderer>().material;
-            GetComponent<Renderer>().material = enemyMaterial;
-            Destroy(other.gameObject);
-            counter.EnemyCounter++;
-            counter.checkEnem();
+            rb.MovePosition(rb.position + transform.forward * movement * Time.fixedDeltaTime);
         }
     }
 
-    private void OnCollisionExit(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.tag == "Walls")
+        if (other.gameObject.CompareTag("toolChange"))
         {
-            Collider wall = collision.gameObject.GetComponent<Collider>();
-            wall.isTrigger = false;
-            isMove = true;
-
+            int i = 0;
+            tools[i].SetActive(false);
+            tools[i + 1].SetActive(true);
         }
     }
 }
